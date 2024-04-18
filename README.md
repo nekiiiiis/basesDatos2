@@ -1,8 +1,8 @@
-# Ethereum Wallet Balance Checker
+# Ethereum Wallet Tracker
 
 ## Descripción
 
-Este proyecto es una aplicación de servidor Node.js diseñada para recuperar y mostrar el saldo de una wallet de Ethereum en Ether. Utiliza la API de Etherscan para obtener el saldo en wei y lo convierte a Ether antes de almacenarlo en una base de datos MongoDB. La aplicación proporciona una interfaz de API REST que permite consultar el saldo por dirección de wallet.
+Este proyecto es una aplicación de servidor Node.js diseñada para recuperar y mostrar el saldo de una wallet de Ethereum en Ether. Utiliza la API de Etherscan para obtener el saldo en wei y lo convierte a Ether antes de almacenarlo en una base de datos MongoDB. La aplicación proporciona una interfaz de API REST que permite consultar el saldo por dirección de wallet y a su vez asignarla a un email y un usuario de Twitter.
 
 Además, necesitarás una API Key de Etherscan (proporciono yo una gratuita).
 
@@ -28,12 +28,17 @@ Además, necesitarás una API Key de Etherscan (proporciono yo una gratuita).
 
 Para iniciar el servidor, ejecuta el comando npm run start.
 
-Una vez que el servidor esté corriendo, puedes acceder a la ruta especificada para consultar el saldo de una wallet de Ethereum mediante su dirección.
+Una vez que el servidor esté corriendo, puedes acceder a la siguiente ruta para consultar el saldo de una wallet y asociarla a una entidad.
+
+Ejemplo: http://localhost:3000/assign-user
+
+A su vez, puedes acceder a la ruta especificada para consultar el saldo de una wallet de Ethereum mediante su dirección para visualizacion json.
 
 Ejemplo: http://localhost:3000/address?id=tu-dirección-ethereum
 
 ## Características
 
+- Capacidad de relacionar wallets con entidades.
 - Visualizacion del saldo de la wallet de Ethereum utilizando la API de Etherscan.
 - Conversión de saldo de wei a Ether.
 - Almacenamiento del saldo en MongoDB.
