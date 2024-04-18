@@ -9,7 +9,7 @@ Además, necesitarás una API Key de Etherscan (proporciono yo una gratuita).
 ## Instalación
 
 1. **Clonar el repositorio**
-   Asegúrate de clonar el repositorio desde GitHub u otro sistema de control de versiones.
+   
 
 2. **Instalar las dependencias**
    
