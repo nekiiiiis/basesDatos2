@@ -1,7 +1,7 @@
 {
   "mongodb": {
     "server": "localhost:27017",
-    "database": "ApiExpress",
+    "database": "apiexpress",
     "user": null,
     "password": null
   }
