@@ -4,6 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const getAddressData = require("./modules/etherscan/etherscan.client");
+
 var app = express();
 
 var MongoDBUtil = require('./modules/mongodb/mongodb.module').MongoDBUtil;
@@ -27,6 +29,14 @@ app.get('/', function (req, res) {
         status: 'up'
     });
 });
+
+
+app.get("/address", async function (req, res) {
+    const contrato = req.query.id;
+    const {result} = await getAddressData(contrato);
+    res.json({eth: result / 1000000000000000000});
+
+})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
