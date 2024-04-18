@@ -5,8 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var MongoDBUtil = require('./modules/mongodb/mongodb.module').MongoDBUtil;
-var UserController = require('./modules/user/user.module')().UserController;
-var getAndStoreWalletBalance = require("./modules/etherscan/etherscan.client");  // Asegúrate de que esta es la única importación de getAndStoreWalletBalance
+var userModule = require('./modules/user/user.module')(); // Se asume que userModule es una función que retorna un objeto
+var getAndStoreWalletBalance = require("./modules/etherscan/etherscan.client");
 
 var app = express();
 
@@ -14,27 +14,25 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public'))); // Agregar para servir archivos estáticos
 
 // Iniciar conexión a MongoDB
 MongoDBUtil.init();
 
 // Rutas
-app.use('/users', UserController);
+app.use('/users', userModule.UserController); // Asumiendo que UserController está correctamente definido en user.module
 
-app.get('/', function (req, res) {
-    var pkg = require(path.join(__dirname, 'package.json'));
-    res.json({
-        name: pkg.name,
-        version: pkg.version,
-        status: 'up'
-    });
+// Página principal - ahora servirá el formulario HTML
+app.get('/assign-user', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'userForm.html'));
 });
 
-app.get("/address", async function (req, res) {
-    const address = req.query.id;
+// Ruta para obtener el saldo de una dirección de wallet
+app.get("/address/:walletAddress", async function (req, res) {
+    const walletAddress = req.params.walletAddress;
     try {
-        const walletData = await getAndStoreWalletBalance(address);
-        res.json({ eth: walletData ? walletData.balance : 0 });  // Devolver 0 si walletData es nulo
+        const walletData = await getAndStoreWalletBalance(walletAddress);
+        res.json({ eth: walletData ? walletData.balance : "Saldo no disponible" });  // Cambiado para que devuelva un mensaje si no hay datos
     } catch (error) {
         console.error("Error retrieving address data:", error);
         res.status(500).json({ error: 'Failed to retrieve address data' });
@@ -57,5 +55,6 @@ app.use(function (err, req, res, next) {
         error: res.locals.error
     });
 });
+
 
 module.exports = app;

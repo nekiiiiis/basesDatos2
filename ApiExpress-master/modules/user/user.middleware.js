@@ -1,98 +1,56 @@
-(function () {
-    'use strict';
+const UserService = require('./user.service');
 
-    module.exports = {
-        addUser: addUser,
-        getUsers: getUsers,
-        getUserById: getUserById,
-        modifyUser: modifyUser,
-        removeUser: removeUser
-    };
-   
-    var UserService = require('./user.module')().UserService;
-
-    function addUser(req, res, next) {
-        UserService.createUser(req.body)
-            .then(success)
-            .catch(failure);
-
-        function success(data) {
+const userMiddleware = {
+    addUser: async (req, res, next) => {
+        try {
+            const data = await UserService.createUser(req.body);
             req.response = data;
             next();
-        }
-
-        function failure(error) {
+        } catch (error) {
             next(error);
         }
+    },
 
-    }
-
-    function getUsers(req, res, next) {
-
-        UserService.fetchUsers()
-            .then(success)
-            .catch(failure);
-
-        function success(data) {
+    getUsers: async (req, res, next) => {
+        try {
+            const data = await UserService.fetchUsers();
             req.response = data;
             next();
+        } catch (error) {
+            next(error);
         }
+    },
 
-        function failure(err) {
-            next(err);
-        }
-
-    }
-
-    function getUserById(req, res, next) {
-
-        UserService.fetchUserById(req.params.userId)
-            .then(success)
-            .catch(failure);
-
-        function success(data) {
+    getUserById: async (req, res, next) => {
+        try {
+            const data = await UserService.fetchUserById(req.params.userId);
             req.response = data;
             next();
+        } catch (error) {
+            next(error);
         }
+    },
 
-        function failure(err) {
-            next(err);
-        }
-
-    }
-
-function modifyUser(req, res, next) {
-        UserService.updateUser(req.params.userId, req.body)
-            .then(success)
-            .catch(error);
-
-        function success(data) {
+    modifyUser: async (req, res, next) => {
+        try {
+            const walletAddress = req.params.walletAddress;
+            const data = await UserService.updateUserByWalletAddress(walletAddress, req.body);
             req.response = data;
             next();
+        } catch (error) {
+            next(error);
         }
+    },
 
-        function error(err) {
-            next(err);
-        }
-    }
-
-    function removeUser(req, res, next) {
-
-        UserService.deleteUser(req.params.userId)
-            .then(success)
-            .catch(error);
-
-        function success(data) {
+    removeUser: async (req, res, next) => {
+        try {
+            const data = await UserService.deleteUser(req.params.userId);
             req.response = data;
             next();
+        } catch (error) {
+            next(error);
         }
-
-        function error(err) {
-            next(err);
-        }
-
     }
+};
 
-
-
-})();
+module.exports = userMiddleware;

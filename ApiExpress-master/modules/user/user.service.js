@@ -1,38 +1,22 @@
-(function () {
-    'use strict';
+const User = require('./user.model');
 
-    module.exports = {
-        createUser: createUser,
-        fetchUsers: fetchUsers,
-        fetchUserById: fetchUserById,
-        updateUser: updateUser,
-        deleteUser: deleteUser
-    };
+exports.createUser = async function (userData) {
+    const user = new User(userData);
+    return await user.save();
+};
 
-    var UserModel = require('./user.module')().UserModel;
-    function createUser(user) {
-        return UserModel.create(user);
-    }
+exports.fetchUsers = async function () {
+    return await User.find({});
+};
 
-    function fetchUsers() {
-        return UserModel.find({})
-            .exec();
-    }
+exports.fetchUserById = async function (userId) {
+    return await User.findById(userId);
+};
 
-    function fetchUserById(userId) {
-        return UserModel.findById(userId)
-            .exec();
-    }
+exports.updateUser = async function (userId, updateData) {
+    return await User.findByIdAndUpdate(userId, updateData, { new: true });
+};
 
-    function updateUser(userId, user) {
-        return UserModel
-            .findByIdAndUpdate(userId, user, {new: true})
-            .exec();
-    }
-
-    function deleteUser(userId) {
-        return UserModel
-            .findByIdAndRemove(userId)
-            .exec();
-    }
-})();
+exports.deleteUser = async function (userId) {
+    return await User.findByIdAndDelete(userId);
+};

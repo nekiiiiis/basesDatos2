@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Asignar Usuario a Wallet</title>
+</head>
+<body>
+    <h1>Wallets Disponibles</h1>
+    <div id="walletsContainer"></div>
+
+    <!-- Formulario para añadir una nueva wallet -->
+    <h2>Añadir Nueva Wallet</h2>
+    <form id="addWalletForm">
+        <label for="newWalletAddress">Wallet Address:</label>
+        <input type="text" id="newWalletAddress" name="walletAddress" required><br><br>
+        
+        <label for="newEmail">Email:</label>
+        <input type="email" id="newEmail" name="email" required><br><br>
+        
+        <label for="newTwitterUsername">Twitter Username:</label>
+        <input type="text" id="newTwitterUsername" name="twitterUsername"><br><br>
+        
+        <button type="submit">Añadir Wallet</button>
+    </form>
+
+    <script>
+            document.getElementById('addWalletForm').onsubmit = async function(event) {
+        event.preventDefault();
+
+        const walletAddress = document.getElementById('newWalletAddress').value;
+        const email = document.getElementById('newEmail').value;
+        const twitterUsername = document.getElementById('newTwitterUsername').value;
+
+        const response = await fetch('/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ walletAddress, email, twitterUsername })
+        });
+
+        if (response.ok) {
+            console.log('Wallet añadida con éxito');
+            window.location.reload();  // Recarga la página para mostrar la nueva wallet
+        } else {
+            console.error('Error al añadir wallet');
+        }
+    };
+
+    // Función para cargar y mostrar wallets existentes y sus saldos
+    async function loadWallets() {
+        const response = await fetch('/users');
+        const wallets = await response.json();
+        const container = document.getElementById('walletsContainer');
+
+        wallets.forEach(async wallet => {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <p>Wallet Address: ${wallet.walletAddress} - <span class="balance">Loading...</span></p>
+                <input type="text" placeholder="Twitter Username" value="${wallet.twitterUsername || ''}" />
+                <input type="email" placeholder="Email" value="${wallet.email || ''}" />
+                <button onclick="updateUser('${wallet.walletAddress}')">Actualizar</button>
+            `;
+            container.appendChild(div);
+            await loadBalance(wallet.walletAddress, div.querySelector('.balance'));
+        });
+    }
+
+    // Función para obtener el saldo de la wallet y convertirlo a ETH
+    async function loadBalance(walletAddress, balanceElement) {
+        const apiKey = 'SRX4R8IP7EFJMXX3IZYWB9882YFFH1KH4I';
+        const url = `https://api.etherscan.io/api?module=account&action=balance&address=${walletAddress}&tag=latest&apikey=${apiKey}`;
+        const balanceResponse = await fetch(url);
+        const balanceData = await balanceResponse.json();
+        if (balanceData.status === "1") {
+            const balanceInWei = BigInt(balanceData.result);
+            const balanceInEth = balanceInWei / BigInt(1e18);
+            balanceElement.textContent = `Balance: ${balanceInEth.toString()} ETH`;
+        } else {
+            balanceElement.textContent = 'Balance: Error';
+        }
+    }
+
+    loadWallets();
+    </script>
+</body>
+</html>

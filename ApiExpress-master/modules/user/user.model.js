@@ -1,31 +1,23 @@
-(function () {
-    var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-    var Schema = mongoose.Schema;
+const userSchema = new mongoose.Schema({
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    twitterUsername: {
+        type: String,
+        required: false,
+        unique: false
+    },
+    walletAddress: {
+        type: String,
+        required: true,
+        unique: true
+    }
+});
 
-    var UserSchema = new Schema({
-        firstName: {
-            type: String,
-            required: true
-        },
-        lastName: {
-            type: String,
-            required: true
-        },
-        email: {
-            type: String,
-            required: true
-        },
-        phoneNumber: {
-            type: Number,
-            required: true
-        },
-        address: String,
-        city: String,
-        state: String,
-        zipCode: String,
-        country: String
-    });
+const User = mongoose.model('User', userSchema);
 
-    module.exports = mongoose.model('users', UserSchema);
-})();
+module.exports = User;
