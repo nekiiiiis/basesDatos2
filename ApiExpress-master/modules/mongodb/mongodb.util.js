@@ -11,33 +11,32 @@
 
     function init() {
         var options = {
-            promiseLibrary: require('bluebird'),
             useNewUrlParser: true,
-			useUnifiedTopology: true 
+            useUnifiedTopology: true 
         };
 
         var connectionString = prepareConnectionString(mongodbConfig);
        
         mongoose.connect(connectionString, options)
-            .then(function (result) {
+            .then(function () {
                 console.log("MongoDB connection successful. DB: " + connectionString);
             })
             .catch(function (error) {
-                console.log(error.message);
-                console.log("Error occurred while connecting to DB: : " + connectionString);
+                console.log("Error occurred while connecting to DB: : " + connectionString, error.message);
             });
     }
 
     function prepareConnectionString(config) {
-        var connectionString = 'mongodb://';
-
-        if (config.user) {
-            connectionString += config.user + ':' + config.password + '@';
+        let connectionString = 'mongodb://';
+    
+        if (config.user && config.password) {
+            connectionString += encodeURIComponent(config.user) + ':' + encodeURIComponent(config.password) + '@';
         }
-
+    
         connectionString += config.server + '/' + config.database;
-
+        connectionString += '?authSource=admin'; // Asegúrate de que el authSource sea correcto
+    
         return connectionString;
     }
-
+    
 })();
