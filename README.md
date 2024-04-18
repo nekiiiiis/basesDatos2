@@ -18,8 +18,8 @@ Además, necesitarás una API Key de Etherscan (proporciono yo una gratuita).
 - MongoDB (local o remoto)
 - npm install axios
 
-3. **Configuración de variables de entorno**
-   Configura el archivo mongodb-config.json para poder acceder a la BD.
+3. **Configura el archivo mongodb-config.json para poder acceder a la BD.**
+   
 
 4. **Configuración del MongoDB**
    Asegúrate de que MongoDB está corriendo y accesible, y que las credenciales y el host están correctamente configurados en las variables de entorno.
