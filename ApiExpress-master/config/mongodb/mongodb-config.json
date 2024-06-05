@@ -2,7 +2,7 @@
   "mongodb": {
     "server": "localhost:27017",
     "database": "apiexpress",
-    "user": "tu-usuario",
-    "password": "tu-contraseña"
+    "user": "tuUsuario",
+    "password": "tuContraseña"
   }
 }

@@ -33,8 +33,7 @@ const userMiddleware = {
 
     modifyUser: async (req, res, next) => {
         try {
-            const walletAddress = req.params.walletAddress;
-            const data = await UserService.updateUserByWalletAddress(walletAddress, req.body);
+            const data = await UserService.updateUser(req.params.userId, req.body);
             req.response = data;
             next();
         } catch (error) {

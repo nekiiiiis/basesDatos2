@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     email: {
         type: String,
         required: true,
@@ -11,10 +12,10 @@ const userSchema = new mongoose.Schema({
         required: false,
         unique: false
     },
-    walletAddress: {
-        type: String,
-        required: true,
-        unique: true
+    wallet: {
+        type: Schema.Types.ObjectId,
+        ref: 'Wallet',
+        required: true
     }
 });
 

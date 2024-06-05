@@ -22,4 +22,5 @@ router.delete('/users/:userId', userModule.UserMiddleware.removeUser, function (
     res.status(200).json(req.response);
 });
 
+
 module.exports = router;

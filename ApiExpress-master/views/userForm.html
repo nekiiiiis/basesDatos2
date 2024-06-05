@@ -2,86 +2,136 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Asignar Usuario a Wallet</title>
+    <title>Gestión de Entidades y Wallets ERC-20</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        form, .user-entry { 
+            margin: 20px; 
+            padding: 20px; 
+            border: 1px solid #ccc; 
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input, button { 
+            margin: 5px; 
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            cursor: pointer;
+            background-color: #5C67F2;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #4a54e1;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <h1>Wallets Disponibles</h1>
+    <h1>Gestión de Wallets y Usuarios</h1>
     <div id="walletsContainer"></div>
 
-    <!-- Formulario para añadir una nueva wallet -->
-    <h2>Añadir Nueva Wallet</h2>
-    <form id="addWalletForm">
+    <!-- Formulario para añadir un nuevo usuario con wallet -->
+    <h2>Añadir Nuevo Usuario y Wallet</h2>
+    <form id="addUserForm">
         <label for="newWalletAddress">Wallet Address:</label>
-        <input type="text" id="newWalletAddress" name="walletAddress" required><br><br>
+        <input type="text" id="newWalletAddress" name="walletAddress" required><br>
         
         <label for="newEmail">Email:</label>
-        <input type="email" id="newEmail" name="email" required><br><br>
+        <input type="email" id="newEmail" name="email" required><br>
         
         <label for="newTwitterUsername">Twitter Username:</label>
-        <input type="text" id="newTwitterUsername" name="twitterUsername"><br><br>
+        <input type="text" id="newTwitterUsername" name="twitterUsername"><br>
         
-        <button type="submit">Añadir Wallet</button>
+        <button type="submit">Añadir Usuario</button>
     </form>
 
     <script>
-            document.getElementById('addWalletForm').onsubmit = async function(event) {
-        event.preventDefault();
+        document.getElementById('addUserForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const walletAddress = document.getElementById('newWalletAddress').value;
+            const email = document.getElementById('newEmail').value;
+            const twitterUsername = document.getElementById('newTwitterUsername').value;
 
-        const walletAddress = document.getElementById('newWalletAddress').value;
-        const email = document.getElementById('newEmail').value;
-        const twitterUsername = document.getElementById('newTwitterUsername').value;
+            const response = await fetch('/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ walletAddress, email, twitterUsername })
+            });
 
-        const response = await fetch('/users', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ walletAddress, email, twitterUsername })
-        });
+            if (response.ok) {
+                console.log('Usuario añadido con éxito');
+                window.location.reload();
+            } else {
+                console.error('Error al añadir usuario');
+            }
+        };
 
-        if (response.ok) {
-            console.log('Wallet añadida con éxito');
-            window.location.reload();  // Recarga la página para mostrar la nueva wallet
-        } else {
-            console.error('Error al añadir wallet');
+        async function loadUsers() {
+            const response = await fetch('/users');
+            if (!response.ok) {
+                console.error('Error al cargar los usuarios');
+                return;
+            }
+            const users = await response.json();
+            const container = document.getElementById('walletsContainer');
+            container.innerHTML = '';
+
+            users.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'user-entry';
+                div.innerHTML = `
+                    <p>Email: ${user.email} | Wallet Address: ${user.walletAddress || 'No Address'}</p>
+                    <input type="text" placeholder="Twitter Username" value="${user.twitterUsername || ''}" data-id="${user._id}" name="twitterUsername" />
+                    <button onclick="updateUser('${user._id}')">Actualizar</button>
+                    <button onclick="deleteUser('${user._id}')">Eliminar</button>
+                `;
+                container.appendChild(div);
+            });
         }
-    };
 
-    // Función para cargar y mostrar wallets existentes y sus saldos
-    async function loadWallets() {
-        const response = await fetch('/users');
-        const wallets = await response.json();
-        const container = document.getElementById('walletsContainer');
+        async function updateUser(userId) {
+            const twitterUsername = document.querySelector(`input[data-id='${userId}'][name='twitterUsername']`).value;
+            const response = await fetch(`/users/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ twitterUsername })
+            });
 
-        wallets.forEach(async wallet => {
-            const div = document.createElement('div');
-            div.innerHTML = `
-                <p>Wallet Address: ${wallet.walletAddress} - <span class="balance">Loading...</span></p>
-                <input type="text" placeholder="Twitter Username" value="${wallet.twitterUsername || ''}" />
-                <input type="email" placeholder="Email" value="${wallet.email || ''}" />
-                <button onclick="updateUser('${wallet.walletAddress}')">Actualizar</button>
-            `;
-            container.appendChild(div);
-            await loadBalance(wallet.walletAddress, div.querySelector('.balance'));
-        });
-    }
-
-    // Función para obtener el saldo de la wallet y convertirlo a ETH
-    async function loadBalance(walletAddress, balanceElement) {
-        const apiKey = 'SRX4R8IP7EFJMXX3IZYWB9882YFFH1KH4I';
-        const url = `https://api.etherscan.io/api?module=account&action=balance&address=${walletAddress}&tag=latest&apikey=${apiKey}`;
-        const balanceResponse = await fetch(url);
-        const balanceData = await balanceResponse.json();
-        if (balanceData.status === "1") {
-            const balanceInWei = BigInt(balanceData.result);
-            const balanceInEth = balanceInWei / BigInt(1e18);
-            balanceElement.textContent = `Balance: ${balanceInEth.toString()} ETH`;
-        } else {
-            balanceElement.textContent = 'Balance: Error';
+            if (response.ok) {
+                console.log('Usuario actualizado con éxito');
+                window.location.reload();
+            } else {
+                console.error('Error al actualizar usuario');
+            }
         }
-    }
 
-    loadWallets();
+        async function deleteUser(userId) {
+            const response = await fetch(`/users/${userId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                console.log('Usuario eliminado con éxito');
+                window.location.reload();
+            } else {
+                console.error('Error al eliminar usuario');
+            }
+        }
+
+        loadUsers();
     </script>
 </body>
 </html>

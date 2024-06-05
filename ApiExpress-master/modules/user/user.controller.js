@@ -22,12 +22,4 @@ router.delete('/:userId', userModule.UserMiddleware.removeUser, (req, res) => {
     res.status(200).json(req.response);
 });
 
-router.get('/wallets', userModule.UserMiddleware.getUsers, (req, res) => {
-    res.status(200).json(req.response);
-});
-
-router.put('/users/:walletAddress', userModule.UserMiddleware.modifyUser, (req, res) => {
-    res.status(200).json(req.response);
-});
-
 module.exports = router;
